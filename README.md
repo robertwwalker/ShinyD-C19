@@ -47,3 +47,8 @@ The configuration files for the shiny server.
 ## `shiny-server.sh`
 
 The logs are configured here.
+
+## The app
+
+<iframe src="https://shinyc19-geiwez4tia-uc.a.run.app" width="900" height="800"></iframe>
+

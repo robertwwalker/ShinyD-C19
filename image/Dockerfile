@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y \
  
 # install R packages required 
 # (change it depending on the packages you need)
-RUN R -e "install.packages(c('rmarkdown','shiny','patchwork','tidyverse','knitr','plotly','flexdashboard','ggrepel','hrbrthemes','ggthemes','lubridate','magrittr','patchwork','leaflet','tigris','tidycensus'), repos='http://cran.rstudio.com/')"
+RUN R -e "install.packages(c('rmarkdown','shiny','sp','patchwork','tidyverse','knitr','plotly','flexdashboard','ggrepel','hrbrthemes','ggthemes','lubridate','magrittr','patchwork','leaflet','tigris','tidycensus'), repos='http://cran.rstudio.com/')"
 # Copy configuration files into the Docker image
 # COPY shiny-server.conf  /etc/shiny-server/shiny-server.conf
 # COPY /app/index.Rmd /srv/shiny-server/
@@ -35,15 +35,15 @@ EXPOSE 3838
 # COPY shiny-server.sh /usr/bin/shiny-server.sh
 # RUN ["chmod", "+x", "/usr/bin/shiny-server.sh"]
 # CMD ["/usr/bin/shiny-server.sh"]
-RUN mkdir -p /bin
-COPY /app/index.Rmd    /bin/index.Rmd
+# RUN mkdir -p /bin
+COPY /app/index.Rmd    /srv/shiny-server/index.Rmd
 
 
 # make all app files readable (solves issue when dev in Windows, but building in Ubuntu)
-RUN chmod -R 755 /bin
+# RUN chmod -R 755 /bin
 
 # expose port on Docker container
-EXPOSE 3838
+# EXPOSE 3838
 
 # run flexdashboard as localhost and on exposed port in Docker container
-CMD ["R", "-e", "rmarkdown::run('/bin/index.Rmd', shiny_args = list(port = 3838))"]
+CMD ["R", "-e", "rmarkdown::run('/srv/shiny-server/index.Rmd', shiny_args = list(port = 3838, host = '0.0.0.0'))"]

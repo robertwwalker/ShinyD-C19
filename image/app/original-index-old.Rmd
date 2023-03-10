@@ -11,84 +11,13 @@ runtime: shiny
 ---
 
 ```{r global, include=FALSE}
-library(tigris) 
-library(tidyverse) 
-library(ggrepel)
-library(ggthemes)
-library(plotly)
-library(flexdashboard)
-library(magrittr)
-library(shiny)
-library(tidycensus)
-library(hrbrthemes)
-library(patchwork)
-library(leaflet)
+library(tigris); library(tidyverse); library(ggrepel); library(ggthemes); library(plotly)
+library(flexdashboard); library(magrittr); library(shiny); library(tidycensus); library(hrbrthemes); library(patchwork); library(leaflet)
 options(scipen=10)
-```
-
-```{r}
-# I want to undertake a refactoring of this code.
-# The basic idea is to decrease the memory intensitivity of the application.  My method will be to separate out a few separate functions.  The original app, built to run on a server I control, could be messy about starting from and filtering on a giant combined dataset.
-# For container computing, this is less than ideal.
-# Load the data.
-NYT.County <- read_csv(url("https://github.com/nytimes/covid-19-data/raw/master/us-counties.csv"))
-# Load the data for the map.
-My.url <- url("https://github.com/robertwwalker/DADMStuff/raw/master/MapData.RData")
-load(My.url)
-close(My.url)
-# Create a fips code by concentenating the state and country codes.
-FC <- tigris::fips_codes %>% mutate(fips = paste0(state_code,county_code))
-# Create a vector of all fips codes.
-NYTfips <- names(table(NYT.County$fips))
-# Create a vector of all available dates.
-NYTDates <- names(table(NYT.County$date))
-```
-
-
-```{r}
-# Prepare the data
-Base.Data <- 
-  expand.grid(fips = NYTfips, date=NYTDates, stringsAsFactors = FALSE) %>% # create a grid
-  mutate(date=as.Date(as.character(date))) %>%   # Turn the date into a proper date.
-  left_join(., FC) %>%  # join the fips codes to the grid
-  left_join(., NYT.County, by = c('fips' = 'fips', 'date' = 'date')) %>% # join the data to the fips/grid
-  mutate(cases = replace_na(cases, 0), deaths=replace_na(deaths,0)) %>% # replace NA with 0
-  ungroup()
-County.Data <- Base.Data %>%
-  group_by(fips) %>%  # group by county
-  arrange(date, .by_group = TRUE) %>% # sort by date
-  mutate(New.cases = cases - lag(cases, order_by = date),  # daily difference in cases
-         New.deaths = deaths - lag(deaths, order_by = date)) %>%   # daily difference in deaths from COVID-19
-  mutate(New.cases = replace_na(New.cases, 0),    # replace NA with 0
-         New.deaths = replace_na(New.deaths, 0)) %>%   # replace NA with 0
-  mutate(Max.cases = ifelse(is.na(New.cases), 0, cummax(New.cases)),   # Create a time series of current maximum: cases
-         Max.deaths = ifelse(is.na(New.deaths), 0, cummax(New.deaths))) %>%   # Create a time series of current maximum: deaths
-  mutate(MeanC = cummean(New.cases), MeanD = cummean(New.deaths),   # Cumulative average of cases
-         MidC = (MeanC/2) + (Max.cases/2), MidD = (MeanD/2) + (Max.deaths/2)) %>%  # Create a boundary for the gauges
-  mutate(NC7 = zoo::rollmean(New.cases, 7, align = "right", fill=0), ND7 = zoo::rollmean(New.deaths, 7, align = "right", fill=0)) %>%
-  ungroup()
-State.Data <- Base.Data %>%   # Same logic as above; I should've just created a function for this
-  group_by(state_name, date) %>%
-  summarise(cases = sum(cases),
-            deaths = sum(deaths)) %>% ungroup() %>%
-  group_by(state_name) %>%
-  arrange(date, .by_group = TRUE) %>%
-  mutate(New.cases = cases - lag(cases, order_by = date), 
-         New.deaths = deaths - lag(deaths, order_by = date)) %>% 
-  mutate(New.cases = replace_na(New.cases, 0),  
-         New.deaths = replace_na(New.deaths, 0)) %>% 
-  mutate(Max.cases = ifelse(is.na(New.cases), 0, cummax(New.cases)), 
-         Max.deaths = ifelse(is.na(New.deaths), 0, cummax(New.deaths))) %>% 
-  mutate(MeanC = cummean(New.cases), MeanD = cummean(New.deaths), 
-         MidC = (MeanC/2) + (Max.cases/2), MidD = (MeanD/2) + (Max.deaths/2),
-         CFR = deaths / cases) %>%
-  mutate(NC7 = zoo::rollmean(New.cases, 7, align = "right", fill=0), ND7 = zoo::rollmean(New.deaths, 7, align = "right", fill=0)) %>%
-  ungroup()
 # Create the selector items for state
-State.Choice <- State.Data %>% as.data.frame() %$% table(state_name) %>% data.frame()
+State.Choice <- Merger %>% as.data.frame() %$% table(state_name) %>% data.frame()
 # Create the selector items for date
-Date.Choice <- State.Data %>% as.data.frame() %$% table(date) %>% data.frame() %>% mutate(date = as.Date(as.character(date)))
-rm(Base.Data)
+Date.Choice <- Merger %>% as.data.frame() %$% table(date) %>% data.frame() %>% mutate(date = as.Date(as.character(date)))
 # Plot the time series of cases
 Plot.TS.Cases <- function(data, state) {
   data %>% ggplot(., aes(x=date, y=cases)) + geom_line() + theme_ipsum_rc() + labs(x="Date", y="COVID-19 Cases", title=paste0("Cases: ",state))
@@ -190,7 +119,7 @@ Plot.Bar10ND <- function(data, state) {
 State
 ======================================================================
 
-Inputs {.sidebar data-width=180}
+Inputs {.sidebar}
 -----------------------------------------------------------------------
 
 ```{r}
@@ -202,7 +131,7 @@ selectInput("date", "Date selection:", choices = Date.Choice$date, selected = ma
 ```{r}
 # Create county choices given state choice.
 County.choices <- reactive({
-  County.Data %>% as.data.frame() %>% filter(state_name == input$state) %$% table(county.x) %>% data.frame() %>% select(county.x)
+  Merger %>% as.data.frame() %>% filter(state_name == input$state) %$% table(county.x) %>% data.frame() %>% select(county.x)
 })
 # Render the county selector
 output$CountyControl <- renderUI({
@@ -210,17 +139,7 @@ output$CountyControl <- renderUI({
 })
 # Construct a dataset for the Maps
 dataset <- reactive({
-  Merger <- County.Data %>% filter(state_name==input$state) %>% filter(date==input$date)
-  Merger <-  merge(counties.t, Merger, by.x = c('STATEFP','COUNTYFP'), by.y = c('state_code','county_code'))  # Merge data to map
-# Create the leaflet popup
- Merger %<>%  mutate(PopUp = popup_sb <- paste0("<strong>", NAMELSAD,     
-                   "</strong><br /> <strong>", state_name, 
-                   "</strong><br /> Cases: ", cases,
-                   "<br />New cases: ", New.cases,
-                   "<br />Max. New cases: ", Max.cases,
-                   "<br />Deaths: ", deaths,
-                   "<br />New deaths: ", New.deaths,
-                   "<br />Max. New deaths: ", Max.deaths))
+  Merger %>% filter(state_name==input$state) %>% filter(date==input$date)
 })
 # Construct a dataset for state gauges and boxes
 dataset2 <- reactive({
