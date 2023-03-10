@@ -1,0 +1,43 @@
+---
+title: "A Shiny COVID-19 Dashboard"
+author: "RWW"
+format: 
+   html:
+     theme: none
+---
+
+
+# Shiny app in a docker container
+
+This takes a COVID-19 dashboard and places it in a docker container running on google cloud.
+
+# 'image' directory
+
+This contains the entirety of the image files.
+
+- Dockerfile
+- `shiny-server.conf`
+- `shiny-server.sh`
+- the *app* directory
+  + `index.Rmd` the single flexdashboard file.
+
+
+The *app* directory contains only those things which are needed for the app to run.  In our case that's the `index.Rmd` file.  You can download that file and run it separately.
+
+
+## Dockerfile and project layout
+
+The Dockerfile here has everything that we need to build the Docker container.  There is [a blog post on the entirety of this exercise here.](https://robertwwalker.github.io/posts/Docker-Shiny/). This is the last example.  The original Shiny app was configured to run in a fairly memory intensive environment because I ran it on my own server.  To rewrite it for google, I refactored it to merge the maps only when necessary.  This significantly reduces the app's overhead.
+
+## `shiny-server.conf`
+
+The configuration files for the shiny server.
+
+## `shiny-server.sh`
+
+The logs are configured here.
+
+## The app
+
+<iframe src="https://shinyc19-geiwez4tia-uc.a.run.app" style="border: 0; width: 100%" height=900></iframe>
+
