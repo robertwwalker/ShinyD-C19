@@ -3,7 +3,7 @@ title: "A Shiny COVID-19 Dashboard"
 author: "RWW"
 format: 
    html:
-     theme: none
+     theme: lux
 ---
 
 
@@ -37,7 +37,7 @@ The configuration files for the shiny server.
 
 The logs are configured here.
 
-## The app
+## The app {.smaller}
 
-<iframe src="https://shinyc19-geiwez4tia-uc.a.run.app" style="border: 0; width: 100%" height=900></iframe>
+<iframe src="https://shinyc19-geiwez4tia-uc.a.run.app" style="border: 0; width: 100%" height=950></iframe>
 

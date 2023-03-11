@@ -21,35 +21,58 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1.6em;
   vertical-align: middle;
 }
-.display.math{display: block; text-align: center; margin: 0.5rem auto;}
 </style>
 
 
 <script src="index_files/libs/clipboard/clipboard.min.js"></script>
-<script src="index_files/libs/quarto-html/tabby.min.js"></script>
+<script src="index_files/libs/quarto-html/quarto.js"></script>
 <script src="index_files/libs/quarto-html/popper.min.js"></script>
 <script src="index_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="index_files/libs/quarto-html/anchor.min.js"></script>
 <link href="index_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="index_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="index_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
 <link href="index_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="index_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="index_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="index_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
 
 </head>
 
-<body>
+<body class="fullcontent">
 
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
 
-<header id="title-block-header">
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
 <h1 class="title">A Shiny COVID-19 Dashboard</h1>
-<p class="author">RWW</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>RWW </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
 
 </header>
 
-<h1 id="shiny-app-in-a-docker-container">Shiny app in a docker container</h1>
+<section id="shiny-app-in-a-docker-container" class="level1">
+<h1>Shiny app in a docker container</h1>
 <p>This takes a COVID-19 dashboard and places it in a docker container running on google cloud.</p>
-<h1 id="image-directory">‘image’ directory</h1>
+</section>
+<section id="image-directory" class="level1">
+<h1>‘image’ directory</h1>
 <p>This contains the entirety of the image files.</p>
 <ul>
 <li>Dockerfile</li>
@@ -61,16 +84,27 @@ ul.task-list li input[type="checkbox"] {
 </ul></li>
 </ul>
 <p>The <em>app</em> directory contains only those things which are needed for the app to run. In our case that’s the <code>index.Rmd</code> file. You can download that file and run it separately.</p>
-<h2 id="dockerfile-and-project-layout" class="anchored">Dockerfile and project layout</h2>
+<section id="dockerfile-and-project-layout" class="level2">
+<h2 class="anchored" data-anchor-id="dockerfile-and-project-layout">Dockerfile and project layout</h2>
 <p>The Dockerfile here has everything that we need to build the Docker container. There is <a href="https://robertwwalker.github.io/posts/Docker-Shiny/">a blog post on the entirety of this exercise here.</a>. This is the last example. The original Shiny app was configured to run in a fairly memory intensive environment because I ran it on my own server. To rewrite it for google, I refactored it to merge the maps only when necessary. This significantly reduces the app’s overhead.</p>
-<h2 id="shiny-server.conf" class="anchored"><code>shiny-server.conf</code></h2>
+</section>
+<section id="shiny-server.conf" class="level2">
+<h2 class="anchored" data-anchor-id="shiny-server.conf"><code>shiny-server.conf</code></h2>
 <p>The configuration files for the shiny server.</p>
-<h2 id="shiny-server.sh" class="anchored"><code>shiny-server.sh</code></h2>
+</section>
+<section id="shiny-server.sh" class="level2">
+<h2 class="anchored" data-anchor-id="shiny-server.sh"><code>shiny-server.sh</code></h2>
 <p>The logs are configured here.</p>
-<h2 id="the-app" class="anchored">The app</h2>
-<iframe src="https://shinyc19-geiwez4tia-uc.a.run.app" style="border: 0; width: 100%" height="900">
+</section>
+<section id="the-app" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="the-app">The app</h2>
+<iframe src="https://shinyc19-geiwez4tia-uc.a.run.app" style="border: 0; width: 100%" height="950">
 </iframe>
+</section>
+</section>
 
+</main>
+<!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -91,10 +125,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
   toggleBodyColorPrimary();  
-  const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
-  tabsets.forEach(function(tabset) {
-    const tabby = new Tabby('#' + tabset.id);
-  });
   const icon = "";
   const anchorJS = new window.AnchorJS();
   anchorJS.options = {
@@ -152,7 +182,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       },
       interactive: true,
       interactiveBorder: 10,
-      theme: 'light-border',
+      theme: 'quarto',
       placement: 'bottom-start'
     };
     window.tippy(el, config); 
@@ -208,6 +238,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+</div> <!-- /content -->
 
 
 
